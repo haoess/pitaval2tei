@@ -157,7 +157,7 @@ foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
     close $text_fh;
 
     # title
-    my $title = extract_title( \@txt );
+    my $title = extract_title( $base, \@txt );
 
     # full citation
     my $bibl = sprintf '%s In: Der neue Pitaval, Bd. %d. Leipzig, %d.' => ($title =~ /\.$/ ? $title : "$title."), $vol, $year;
@@ -234,15 +234,36 @@ foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
 #######################
 
 sub extract_title {
-    my $paras = shift;
+    my ($base, $paras) = @_;
 
     my $title;
     foreach my $p ( @$paras ) {
         $title .= " $p";
-        last if $p =~ /\.$/;
+        last if $p =~ /\)?\.$/;
     }
 
     for ( $title ) {
+        s/\s?\*\)//g;    # footnote signs
+
+        # special cases
+        s/\Q?..?\E.*//sg                if $base =~ /^Bd11_1847_11_/;
+        s/(1821).*/$1./sg               if $base =~ /^Bd12_1847_6_/;
+        s/(Niederrhein\.).*/$1/sg       if $base =~ /^Bd18_1852_3_/;
+        $_ = 'Sawney Cunningham. 1635.' if $base =~ /^Bd19_1852_4_/;
+        s/(\.\)).*/$1/gs                if $base =~ /^Bd1_1842_3_/;
+        s/(52).*/$1./gs                 if $base =~ /^Bd21_1854_1_/;
+        s/(1842\.).*/$1/gs              if $base =~ /^Bd21_1854_4_/;
+        s/(\.\)).*/$1/gs                if $base =~ /^Bd25_1858_14_/;
+        s/(1776\.).*/$1/gs              if $base =~ /^Bd25_1858_1_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd31_1862_3_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd39_1868_1_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd40_1869_3_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd41_1870_4_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd42_1871_6_/;
+        s/(Beide\.").*/$1/gs            if $base =~ /^Bd43_1872_6_/;
+        s/(Vergangenheit\.).*/$1/gs     if $base =~ /^Bd44_1873_6_/;
+        s/((\.)).*/$1/gs                if $base =~ /^Bd46_1875_9_/;
+
         s/\n/ /g;
         s/\s+/ /g;
         s/(?:^\s+|\s+$)//g;

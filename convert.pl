@@ -128,7 +128,8 @@ foreach my $ed (
     $editors{$last} = $editor;
 }
 
-foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
+foreach my $file ( glob sprintf('%s/Bd60_1890_10_Ein-Beitrag-zu-den-Processen-wider-die-Carbonari-in-Italien_1820_1838.txt', $indir) ) {
+#foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
     say STDERR sprintf "parsing text file: $file" if $verbose;
     local $SIG{__WARN__} = sub { die "$file: " . $_[0] };
 
@@ -158,6 +159,7 @@ foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
 
     # title
     my $title = extract_title( \@txt );
+    $Data::Dumper::Sortkeys++; use Data::Dumper; warn Dumper $title;
 
     # full citation
     my $bibl = sprintf '%s In: Der neue Pitaval, Bd. %d. Leipzig, %d.' => ($title =~ /\.$/ ? $title : "$title."), $vol, $year;
@@ -238,13 +240,14 @@ sub extract_title {
 
     my $title;
     foreach my $p ( @$paras ) {
-        $title .= $p;
+        $title .= " $p";
         last if $p =~ /\.$/;
     }
 
     for ( $title ) {
         s/\n/ /g;
         s/\s+/ /g;
+        s/(?:^\s+|\s+$)//g;
     }
     return $title;
 }

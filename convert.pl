@@ -151,7 +151,8 @@ foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
     local $/ = "";
 
     # slurp text in paragraph mode
-    while ( chomp(my $block = <$text_fh>) ) {
+    while ( my $block = <$text_fh> ) {
+        chomp($block);
         push @txt, $block;
     }
     close $text_fh;
@@ -236,7 +237,7 @@ foreach my $file ( glob sprintf('%s/*.txt', $indir) ) {
 sub extract_title {
     my ($base, $paras) = @_;
 
-    my $title;
+    my $title = '';
     foreach my $p ( @$paras ) {
         $title .= " $p";
         last if $p =~ /\)?\.$/;
